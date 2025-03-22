@@ -17,8 +17,9 @@ app.add_middleware(
 )
 router = APIRouter()
 
-#@router.get("")
-# def ipInput(deviceList):
+@router.get("")
+def ipInput(deviceList):
+  deviceList = ""
+  return(deviceList)
 
-
-#@router.put(""):
+# @router.put(""):
