@@ -2,7 +2,7 @@ from typing import List, final
 from fastapi import APIRouter, Depends, HTTPException, FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-x = 
+
 deviceList = ""
 
 app = FastAPI()
@@ -17,6 +17,8 @@ app.add_middleware(
 )
 router = APIRouter()
 
-@router.get("")
-def ipInput(deviceList):
-  
+#@router.get("")
+# def ipInput(deviceList):
+
+
+#@router.put(""):
