@@ -2,6 +2,7 @@ from typing import List, final
 from fastapi import APIRouter, Depends, HTTPException, FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+import pyautogui
 
 deviceList = ""
 
