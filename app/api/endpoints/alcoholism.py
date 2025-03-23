@@ -6,7 +6,6 @@ from app.utils.screenshot import take_screenshot, prodata, device_to_pull, devic
 
 deviceList = ""
 
-
 router = APIRouter()
 
 @router.get("")
