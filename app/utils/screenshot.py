@@ -4,7 +4,7 @@ from PIL import Image
 import base64
 import re
 from openai import OpenAI
-
+from app.utils.config import settings
 client = OpenAI(api_key="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")  # Replace with your API key
 
 
