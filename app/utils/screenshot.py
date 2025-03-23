@@ -1,174 +1,119 @@
 import pyautogui
 import pytesseract
 from PIL import Image
+import base64
+import re
+from openai import OpenAI
+
+client = OpenAI(api_key="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")  # Replace with your API key
+
+
 def take_screenshot():
-    # Capture the screen
-    screenshot = pyautogui.screenshot()
-    # Define the region (x, y, width, height)
-    region = (1879, 1747, 2000, 500)  # Change these values as needed
-    
     # Capture the region
-    screenshot = pyautogui.screenshot(region=region)
+    screenshot = pyautogui.screenshot()
     
     # Save (optional)
-    
+    screenshot.save("screenshot_region.png")
     # Extract text
-    data = pytesseract.image_to_string(screenshot)
+    # import openai
+    # import base64
+    # from openai import OpenAI
+    # import csv
+
+
+    # client = OpenAI(api_key="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")  # Pass key here or set it as env var
+
+
+
+    # # Load and encode the image
+    # with open("/home/shaun/Desktop/intersection/screenshot_region.png", "rb") as img_file:
+    #     base64_image = base64.b64encode(img_file.read()).decode("utf-8")
+
+    # # Call GPT-4 Vision model with image input
+    # response = client.chat.completions.create(
+    #     model="gpt-4o",
+    #     messages=[
+    #         {
+    #             "role": "user",
+    #             "content": [
+    #                 # {"type": "text","text": "Only extract clean CSV-style data from the table in this image. Remove slashes, dashes, extra formatting, and ignore any unrelated or surrounding text."},
+    #                 {"type": "text", "text": "Extract only the raw table data from this image, no explanation or description."},
+    #                 # {"type": "text", "text": "list the index number, IP address, Device Name, and Mac address in a single line per Index always split them with a comma and space"},
+    #                 {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
+    #             ],
+    #         }
+    #     ],
+    #     max_tokens=500,
+    # )
+
+    # data = response.choices[0].message.content
+
+    # print(response.choices[0].message.content)
+
+    # overallInfo = data.replace('```', '')
+
+    # print(overallInfo)
+
+
+
+
+    # === OpenAI client setup ===
     
-    print("Extracted Text:\n", data)
-    
-    
-    # import time
-    # for i in range(100):
-    #     time.sleep(0.5)  # Pause execution for 2 seconds
-    #     print(pyautogui.position())
-    
-    words = data.split()
-    words = [word for word in words if word != "Refresh"]
-    
-    # Create a list to store the formatted data with line breaks
-    formatted_data = []
-    
-    # Process the words in chunks of 4 (for each device: ID, IP, Name, MAC)
-    for i in range(0, len(words), 4):
-        # Join the 4 words and add a line break
-        formatted_data.append(" ".join(words[i:i+4]))
-    
-    # Join the formatted data with a line break after each device
-    prodata = "\n".join(formatted_data)
-    
-    # Print the result
-    print("prodata created")
-    print(prodata)
-    # Raw data
-    
-    print("\n")
-    print("\n")
-    print("\n")
-    
-    # Split the data into lines
-    lines = prodata.strip().split('\n')
-    
-    # Process the data and store in a dictionary with device_id as the key
-    devices = {}
-    
-    # Process the data in chunks of 4 (ID, IP, device_name, MAC)
-    for line in lines:
-        # Split each line into components
-        parts = line.split()
-        if len(parts) == 4:  # Ensure there are exactly 4 components in each line
-            device_id = parts[0]  # Device ID
-            devices[device_id] = {
-                "ip": parts[1],  # IP address
-                "device_name": parts[2],  # Device name
-                "mac": parts[3]  # MAC address
+
+    # === Load and encode the image ===
+    with open("app/utils/screenshot_region.png", "rb") as img_file:
+        base64_image = base64.b64encode(img_file.read()).decode("utf-8")
+
+    # === Send image to GPT-4 Vision ===
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": (
+                            "Extract only the raw table data from this image, no explanation. "
+                            "Format as: index, IP address, Device Name, MAC Address. "
+                            "Ignore slashes and unrelated text."
+                        ),
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}
+                    }
+                ],
             }
-    
-    # Storing devices in variables named after their ID dynamically using globals()
-    for device_id, device_info in devices.items():
-        globals()[f"device_{device_id}"] = device_info
-    
-    # Now, let's pull the information from these dynamically created variables with a single print statement
-    
-    device_to_pull = "2"  # Let's say we want to pull the information for Device 1
-    
-    # Single print statement with the old format
-    print(f"Device {device_to_pull}:\n"
-          f"  IP: {globals()[f'device_{device_to_pull}']['ip']}\n"
-          f"  Name: {globals()[f'device_{device_to_pull}']['device_name']}\n"
-          f"  MAC: {globals()[f'device_{device_to_pull}']['mac']}")
-    
-    deviceInfo = (f"Device {device_to_pull}:\n" +
-          f"  IP: {globals()[f'device_{device_to_pull}']['ip']}\n" +
-          f"  Name: {globals()[f'device_{device_to_pull}']['device_name']}\n" +
-          f"  MAC: {globals()[f'device_{device_to_pull}']['mac']}")
-    
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    lines = prodata.strip().split('\n')
-    
-    # Process the data and store in a dictionary with device_id as the key
-    devices = {}
-    
-    # Process the data in chunks of 4 (ID, IP, device_name, MAC)
-    for line in lines:
-        # Split each line into components
-        parts = line.split()
-        if len(parts) == 4:  # Ensure there are exactly 4 components in each line
-            device_id = parts[0]  # Device ID
-            devices[device_id] = {
-                "ip": parts[1],  # IP address
-                "device_name": parts[2],  # Device name
-                "mac": parts[3]  # MAC address
-            }
-    
-    # Storing devices in variables named after their ID dynamically using globals()
-    for device_id, device_info in devices.items():
-        globals()[f"device_{device_id}"] = device_info
-    
-    # Construct overallInfo string dynamically
+        ],
+        max_tokens=1000,
+    )
+
+    # === Step 1: Raw GPT Output ===
+    raw_data = response.choices[0].message.content
+    print("\n--- Raw GPT Output ---\n")
+    print(raw_data)
+
+    # === Step 2: Clean up triple backticks and whitespace ===
+    cleaned_data = raw_data.replace("```", "").strip()
+    lines = cleaned_data.split('\n')
+
+    # === Step 3: Format table with aligned columns and store in variable ===
+    col_widths = [4, 18, 22, 20]
+    header = ["#", "IP Address", "Device Name", "MAC Address"]
+
+    # Build final_output as a string
     overallInfo = ""
-    
-    # Iterate over each device and append its information to overallInfo
-    for device_id in devices:
-        overallInfo += (f"Device {device_id}:\n"
-                        f"  IP: {globals()[f'device_{device_id}']['ip']}\n"
-                        f"  Name: {globals()[f'device_{device_id}']['device_name']}\n"
-                        f"  MAC: {globals()[f'device_{device_id}']['mac']}\n\n")
-    
-    # Print the overallInfo
-    print(overallInfo)
-    
-    
-    
-    
-    
-    
-    
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    print("\n")
-    
-    lines = prodata.strip().split('\n')
-    
-    # Create a dictionary to store the devices with their ID as the key
-    devices = {}
-    
-    # Process the data in chunks of 4 (ID, IP, device_name, MAC)
+    overallInfo += "".join(word.ljust(width) for word, width in zip(header, col_widths)) + "\n"
+
+    # Add each cleaned data row
     for line in lines:
-        # Split each line into components
-        parts = line.split()
-        if len(parts) == 4:  # Ensure there are exactly 4 components in each line
-            device_id = parts[0]  # Device ID
-            devices[device_id] = {
-                "ip": parts[1],  # IP address
-                "device_name": parts[2],  # Device name
-                "mac": parts[3]  # MAC address
-            }
-    
-    # Storing devices in separate variables dynamically using globals()
-    for device_id, device_info in devices.items():
-        globals()[f"device_{device_id}"] = device_info
-    
-    # Open a file in write mode to store the output
-    with open("devices_output.txt", "w") as file:
-        # Write the information for all devices to the file
-        for device_id in devices:
-            file.write(f"Device {device_id}:\n")
-            file.write(f"  IP: {globals()[f'device_{device_id}']['ip']}\n")
-            file.write(f"  Name: {globals()[f'device_{device_id}']['device_name']}\n")
-            file.write(f"  MAC: {globals()[f'device_{device_id}']['mac']}\n")
-            file.write("\n")  # Newline for better readability
-    
-    print("The output has been written to devices_output.txt")
+        if re.match(r'^\d+\s*,', line.strip()):
+            parts = [part.strip() for part in line.split(",")]
+            if len(parts) == 4:
+                formatted_row = "".join(part.ljust(width) for part, width in zip(parts, col_widths))
+                overallInfo += formatted_row + "\n"
+
+    # === Step 4: Print the final cleaned output ===
+    print("\n--- Final Aligned Output ---\n")
+    print(overallInfo)
