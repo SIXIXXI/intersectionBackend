@@ -1,7 +1,7 @@
 from PIL import Image
 import pyautogui
 
-def take_screenshot(save_path=".utils/Image"):
+def take_screenshot(save_path="app/utils/screenshot.png"):
     """Takes a screenshot and optionally saves it to a file."""
     try:
         screenshot = pyautogui.screenshot()
