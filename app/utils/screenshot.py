@@ -1,4 +1,3 @@
-from PIL import Image
 import pyautogui
 
 def take_screenshot(save_path="app/utils/screenshot.png"):
