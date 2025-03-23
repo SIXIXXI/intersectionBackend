@@ -172,4 +172,3 @@ def take_screenshot():
             file.write("\n")  # Newline for better readability
     
     print("The output has been written to devices_output.txt")
-    
