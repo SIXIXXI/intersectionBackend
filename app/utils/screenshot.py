@@ -5,12 +5,12 @@ import base64
 import re
 from openai import OpenAI
 client = OpenAI(api_key="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")  # Replace with your API key
-
+overallInfo = ""
 
 def take_screenshot():
     # Capture the region
     screenshot = pyautogui.screenshot()
-    
+
     # Save (optional)
     screenshot.save("screenshot_region.png")
     # Extract text
@@ -57,7 +57,7 @@ def take_screenshot():
 
 
     # === OpenAI client setup ===
-    
+
 
     # === Load and encode the image ===
     with open("app/utils/screenshot_region.png", "rb") as img_file:
